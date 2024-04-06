@@ -78,6 +78,8 @@ def uploadFile(file: bytes, file_name: str, folder: str = "", file_type: str = '
     '''
     Use Cloudinary Upload to upload
     '''
+    if "." in file_name:
+        file_name = file_name.split(".")[0]
     file_upload = cloudinary.uploader.upload(
         file, public_id=file_name, unique_filename=False, overwrite=True, folder=folder, resource_type=file_type
     )
@@ -333,7 +335,7 @@ def resizer(pic, newsize):
 # 	final_clip = final_clip.set_audio(audio)
 
 # 	current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-# 	blob_name = f"final_{current_time}_{generate_uuid()}"
+# 	blob_name = f"final_{current_time}_{generate_uuid()}.mp4"
 # 	final_clip.write_videofile(blob_name, fps=30, codec="libx264", audio_codec="aac")
 # 	with open(blob_name, 'rb') as f:
 # 		data = f.read()
@@ -348,6 +350,8 @@ async def fakeVideo():
         "http://res.cloudinary.com/dhm7d2jq6/video/upload/v1712407094/video/energy-efficient%20equipment%20showcase_2024-04-06_20-38-03_7bdf3352-6090-4386-9c2c-1dfa086c33a3.mp4",
     ]
     videoList = []
+    test = requests.get(video[0])
+    print(test.content)
     for idx, video in enumerate(video):
         tempVideo = editor.VideoFileClip(video)
         tempVideo = tempVideo.loop(duration=3)
@@ -357,7 +361,7 @@ async def fakeVideo():
     final_clip = editor.concatenate_videoclips(videoList)
 
     current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    blob_name = f"final_{current_time}_{generate_uuid()}"
+    blob_name = f"final_{current_time}_{generate_uuid()}.mp4"
     final_clip.write_videofile(blob_name, fps=30, codec="libx264", audio_codec="aac")
     with open(blob_name, 'rb') as f:
         data = f.read()
@@ -427,7 +431,7 @@ async def stitchVideos(MovieBody: MovieBody):
     final_clip = final_clip.set_audio(audio)
 
     current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    blob_name = f"final_{current_time}_{generate_uuid()}"
+    blob_name = f"final_{current_time}_{generate_uuid()}.mp4"
     final_clip.write_videofile(blob_name, fps=30, codec="libx264", audio_codec="aac")
     with open(blob_name, 'rb') as f:
         data = f.read()
