@@ -38,9 +38,9 @@ You will be given two pieces of information: the business information and a list
 
 This is the business information: \"\"\"{info}\"\"\"
 
-Here is a list of explanations on why the scheme is relevant: \"\"\"{explanations}\"\"\"
+Explaining some possible schemes for the business: \"\"\"{explanations}\"\"\"
 
-Referring to the above, write the content of a script to share on the scheme and convince the business to apply for it (30-45 seconds of content). Remember you are talking to them directly. Remember to consider all the above schemes mentioned.
+Referring to the many schemes above, write the content of a script to share on the scheme and convince the business to apply for it (30-45 seconds of content). Remember you are talking to them directly. Remember to consider all the above schemes mentioned.
 """
 
 ENHANCE_SCRIPT_CHECK = """Imagine you are a marketing professional. You will be given business information, a list of schemes and a draft script.
