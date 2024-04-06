@@ -32,7 +32,7 @@ function Home() {
   return (
     <div
       style={containerStyle}
-      className="w-full overflow-auto flex flex-col justify-center"
+      className="w-full overflow-auto flex flex-col justify-center text-white"
     >
       <div className="pl-4 md:pl-20 lg:pl-20 text-left">
         <h1 className="text-5xl">GovGuide</h1>
