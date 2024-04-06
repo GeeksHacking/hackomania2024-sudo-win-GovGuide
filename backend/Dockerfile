@@ -12,6 +12,16 @@ RUN apt-get install ffmpeg libsm6 libxext6  -y
 
 RUN apt-get install -y imagemagick
 
+RUN apt-get -y install fonts-liberation
+
+RUN apt-get install -y locales && \
+  locale-gen C.UTF-8 && \
+  /usr/sbin/update-locale LANG=C.UTF-8
+
+ENV LC_ALL C.UTF-8
+
+RUN sed -i 's/none/read,write/g' /etc/ImageMagick-6/policy.xml 
+
 COPY . .
 
 EXPOSE 8000
