@@ -263,14 +263,14 @@ const Prompt = () => {
     <div id="prompt" className="flex justify-center w-full h-fit">
       <Card className="min-w-[350px] flex mx-auto max-w-[750px] flex-col md:flex-row">
         <div className="min-w-[350px] max-w-[350px] w-full">
-          <CardHeader>
+          <CardHeader className="p-4">
             <CardTitle>GovGuide - Guiding your business to success.</CardTitle>
             <CardDescription>
               Our state of the art AI will generate an infomercial based on your
               prompt to guide you through your business journey.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 pt-0">
             <form
               className="flex flex-col items-start justify-start gap-3"
               onSubmit={async (e) => {
@@ -294,7 +294,7 @@ const Prompt = () => {
                 placeholder="Industry"
                 ref={textAreaRef}
                 rows={1}
-                value={concerns}
+                value={industry}
               />
               <textarea
                 id="prompt-text"
@@ -324,7 +324,11 @@ const Prompt = () => {
                 value={nature}
               />
 
-              <Button disabled={loading} className="mt-4 text-white" type="submit">
+              <Button
+                disabled={loading}
+                className="mt-4 text-white"
+                type="submit"
+              >
                 {loading && <Loader2 className="mr-2 animate-spin" />}
                 Generate
                 {!loading && <ChevronRight />}

@@ -1,18 +1,36 @@
-import { useState } from 'react';
-import { Navbar, Nav } from '@govtechsg/sgds-react/Nav';
-import { Link } from 'react-router-dom'; // Import Link
+import { useState, useEffect } from "react";
+import { Navbar, Nav } from "@govtechsg/sgds-react/Nav";
+import { Link, useLocation } from "react-router-dom"; // Import Link
+import GovGuideLogo from "@/assets/GovGuide.png";
 
 function NavbarTemplate() {
-  const [active, setActive] = useState('home');
+  const location = useLocation();
+  const [active, setActive] = useState("home");
+
+  const pathMapper: { [key: string]: string } = {
+    "/": "home",
+    "/generate": "generate",
+  };
+
+  useEffect(() => {
+    setActive(pathMapper[location.pathname] || "home");
+  }, [location.pathname]);
 
   const clickNavbarItem = (eventKey: string) => {
     setActive(eventKey);
   };
 
   return (
-    <Navbar className='navbar'>
-      <Navbar.Brand as={Link} to="/">GovGuide</Navbar.Brand> {/* Use as and to for Link */}
-      <Navbar.Toggle aria-controls="basic-navbar-nav"/>
+    <Navbar className="navbar" expand={"md"}>
+      <Navbar.Brand as={Link} to="/">
+        <img
+          src={GovGuideLogo}
+          alt="GovGuide"
+          className="w-[80px] h-[80px] p-2.5"
+        />
+      </Navbar.Brand>
+      {/* Use as and to for Link */}
+      <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="me-auto" navbarScroll activeKey={active}>
           <Nav.Item>
@@ -20,7 +38,7 @@ function NavbarTemplate() {
               as={Link}
               to="/"
               eventKey="home"
-              onClick={() => clickNavbarItem('home')}
+              onClick={() => clickNavbarItem("home")}
             >
               Home
             </Nav.Link>
@@ -30,7 +48,7 @@ function NavbarTemplate() {
               as={Link} // Use as prop
               to="/generate" // Adjust the route accordingly
               eventKey="generate"
-              onClick={() => clickNavbarItem('generate')}
+              onClick={() => clickNavbarItem("generate")}
             >
               Generate
             </Nav.Link>
@@ -39,6 +57,6 @@ function NavbarTemplate() {
       </Navbar.Collapse>
     </Navbar>
   );
-};
+}
 
 export default NavbarTemplate;
