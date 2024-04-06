@@ -4,7 +4,7 @@ WORKDIR /
 
 COPY requirements.txt .
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 RUN apt-get -y update
 
@@ -16,4 +16,4 @@ COPY . .
 
 EXPOSE 8000
 
-ENTRYPOINT ["uvicorn", "app:app"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
