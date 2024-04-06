@@ -54,7 +54,11 @@ class ScriptGenerator:
 		wv_headers: Dict[str, str] = {
 			"X-OpenAI-Api-key": env["OPENAI_API_KEY"],
 		}
-		self.__wv_client: WeaviateClient = weaviate.connect_to_local(headers=wv_headers)
+		self.__wv_client: WeaviateClient = weaviate.connect_to_wcs(
+			cluster_url=env["WEAVIATE_URL"],
+			auth_credentials=weaviate.auth.AuthApiKey(env["WEAVIATE_API_KEY"]),
+			headers=wv_headers,
+		)
 		self.__scheme_chunk_collection: Collection = self.__wv_client.collections.get("scheme_chunks")
 		self.__scheme_whole_collection: Collection = self.__wv_client.collections.get("whole_scheme")
 
