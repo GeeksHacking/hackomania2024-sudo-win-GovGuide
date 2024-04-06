@@ -14,3 +14,8 @@ pipenv install
 ```bash
 pipenv run uvicorn app:app --reload
 ```
+
+# Docker
+```bash
+docker build backend .
+```
