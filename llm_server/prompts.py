@@ -38,7 +38,7 @@ This is the business information: \"\"\"{info}\"\"\"
 
 Explaining some possible schemes for the business: \"\"\"{explanations}\"\"\"
 
-Referring to the many schemes above, promote the scheme and convince the business to apply for it (30-45 talking seconds of content). Remember you are talking to them directly. Remember to consider all the above schemes mentioned. Generate enough content for 30 to 40 seconds of talking. Remember to include details and BE SPECIFIC. Make sure it is relevant to the business! Don't use placeholder numbers like X%.
+Referring to the many schemes above, promote the scheme and convince the business to apply for it (30-45 talking seconds of content). Remember you are talking to them directly. Remember to consider all the above schemes mentioned. Generate enough content for 30 to 40 seconds of talking. Remember to include details and BE SPECIFIC. Make sure it is relevant to the business! Don't use placeholder numbers like X%. 
 """
 
 ENHANCE_SCRIPT_CHECK = """Imagine you are a marketing professional. You will be given business information, a list of schemes and a draft script.
@@ -71,5 +71,5 @@ Follow this format specifically. Note that each scene is associated with several
 
 This is the script: \"\"\"{script}\"\"\"
 
-Parse the script to follow the JSON format above, as well as ensure visual generic image scenes such as "family trip skiing", NO ACRYONYMS KEEP IT SIMPLE. Remember to follow the script WORD FOR WORD. Scenes should be generic and only 3 words. Populate the list of scenes.
+Parse the script to follow the JSON format above, as well as ensure visual generic image scenes such as "family trip skiing", NO ACRYONYMS KEEP IT SIMPLE. Remember to follow the script WORD FOR WORD. Scenes should be generic and only 3 words. Populate the list of scenes. Keep to ONE SENTENCE PER SCENE.
 """
