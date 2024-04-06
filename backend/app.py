@@ -37,6 +37,8 @@ from moviepy import editor
 from PIL import Image
 import numpy as np
 
+from llm_server import ScriptGenerator, UserData
+
 load_dotenv()
 
 # Setup
@@ -96,6 +98,12 @@ def upload():
     )
     return {"image": srcURL}
 
+@app.post("/generateScript")
+async def generateScript(UserData: UserData):
+    script_gen = ScriptGenerator()
+    script_json = script_gen(UserData)
+
+    return script_json
 
 class VoiceBody(BaseModel):
     subtitles: List[str]

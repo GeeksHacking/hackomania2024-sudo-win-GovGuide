@@ -81,9 +81,9 @@ class ScriptGenerator:
 
 		json_content = json.loads(json_content)
 
-		for i, scene in enumerate(json_content['list_of_scenes']):
-			text = scene['subtitles'][0]
-			json_content['list_of_scenes'][i]['subtitles'] = split_text(text)
+		# for i, scene in enumerate(json_content['list_of_scenes']):
+		# 	text = scene['subtitles'][0]
+		# 	json_content['list_of_scenes'][i]['subtitles'] = split_text(text)
 
 		return json_content
 
