@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from typing import List
 import random
 from datetime import datetime, timedelta
+import requests
 
 # Cloudinary
 import cloudinary
@@ -13,7 +14,7 @@ import cloudinary.uploader
 import cloudinary.api
 
 # ElevenLabs
-from elevenlabs import generate as generate_voice, set_api_key, voices
+from elevenlabs.client import ElevenLabs
 
 # FastAPI
 from fastapi import FastAPI
@@ -22,11 +23,19 @@ load_dotenv()
 
 # Setup
 app = FastAPI()
-config = cloudinary.config(secure=True)
+config = cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    secure=True,
+)
+
+# HUGGINGFACE
+HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 
 # ElevenLabs
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
-set_api_key(ELEVENLABS_API_KEY)
+ELEVENLABS_CLIENT = ElevenLabs(api_key=ELEVENLABS_API_KEY)
 
 
 def generate_uuid():
@@ -46,24 +55,22 @@ def index():
     return {"Hello": "World"}
 
 
-def uploadImage() -> str:
+def uploadFile(file: bytes, file_name: str, folder: str = "", file_type: str = 'auto') -> str:
     '''
     Use Cloudinary Upload to upload
     '''
-    cloudinary.uploader.upload(
-        "https://cloudinary-devs.github.io/cld-docs-assets/assets/images/butterfly.jpeg",
-        public_id="quickstart_butterfly",
-        unique_filename=False,
-        overwrite=True,
+    file_upload = cloudinary.uploader.upload(
+        file, public_id=file_name, unique_filename=False, overwrite=True, folder=folder, resource_type=file_type
     )
-    srcURL = cloudinary.CloudinaryImage("quickstart_butterfly").build_url()
-    print("****2. Upload an image****\nDelivery URL: ", srcURL, "\n")
+    srcURL = file_upload['url']
     return srcURL
 
 
 @app.post("/")
 def upload():
-    srcURL = uploadImage()
+    srcURL = uploadFile(
+        "https://cloudinary-devs.github.io/cld-docs-assets/assets/images/butterfly.jpeg", 'quickstart_butterfly'
+    )
     return {"image": srcURL}
 
 
@@ -74,13 +81,35 @@ class VoiceBody(BaseModel):
 @app.post("/generateVoice")
 async def generateVoice(VoiceBody: VoiceBody):
     allText = "\n".join(VoiceBody.subtitles)
-    voiceList = voices()
-    print(voiceList)
+    voiceList = ELEVENLABS_CLIENT.voices.get_all().voices
     selectedVoice = random.choices(voiceList)
     current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    # audio = generate_voice(text=allText, voice=selectedVoice[0])
-    # blob_name = f"audio_{current_time}_{generate_uuid()}.mp3"
-    return "Hi"
-    # blob_client = blob_service_client.get_blob_client(container="audio", blob=blob_name)
-    # blob_client.upload_blob(audio, overwrite=True)
-    # blob_uri = blob_client.url
+    audio = ELEVENLABS_CLIENT.generate(text=allText, voice=selectedVoice[0])
+    blob_name = f"audio_{current_time}_{generate_uuid()}.mp3"
+
+    srcURL = uploadFile(b''.join(audio), blob_name, folder='audio', file_type="raw")
+    return {"voice": srcURL}
+
+
+@app.post("/generateMusic")
+async def generateMusic():
+    music_style = ["slow pace loopable advertisement music"]
+    random_music = music_style[random.randint(0, len(music_style) - 1)]
+    API_URL = "https://api-inference.huggingface.co/models/facebook/musicgen-small"
+    headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
+
+    def query(payload):
+        response = requests.post(API_URL, headers=headers, json=payload)
+        return response.content
+
+    audio_bytes = query(
+        {
+            "inputs": random_music,
+        }
+    )
+    print(audio_bytes)
+    current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    blob_name = f"music_{current_time}_{generate_uuid()}.mp3"
+    srcURL = uploadFile(audio_bytes, blob_name, folder='music', file_type="raw")
+
+    return {"music": srcURL}
