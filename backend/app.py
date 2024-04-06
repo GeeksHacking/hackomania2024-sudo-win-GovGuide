@@ -12,7 +12,6 @@ import aiohttp
 import asyncio
 from uuid import uuid4
 
-
 # Cloudinary
 import cloudinary
 import cloudinary.uploader
@@ -359,7 +358,7 @@ async def stitchVideos(MovieBody: MovieBody):
 		min_window[-1] = [duration, len(re.split(r'\s+', content))]
 	
 	rightest = -1
-	for i in range(len(min_window) - 1, 0, -1):
+	for i in range(len(min_window) - 1, -1, -1):
 		if min_window[i] == 0:
 			min_window[i] = rightest
 		else:
@@ -369,10 +368,12 @@ async def stitchVideos(MovieBody: MovieBody):
 	new_video = []
 	subs = []
 	for idx, subtitle in enumerate(MovieBody.subtitles):
-		dur = 0
+		dur = timedelta(seconds=0)
 		for i in range(0, len(re.split(r'\s+', subtitle))):
+			if left_pad + i >= len(min_window):
+				break
 			data_point = min_window[left_pad + i]
-			dur += timedelta(seconds=(data_point[0] / data_point[1]))
+			dur += data_point[0] / data_point[1]
 		
 		left_pad += len(re.split(r'\s+', subtitle))
 
@@ -389,6 +390,7 @@ async def stitchVideos(MovieBody: MovieBody):
 		print("start", subs[int(idx)][0][0])
 		print("end", subs[int(idx)][0][1])
 		duration = subs[int(idx)][0][1] - subs[int(idx)][0][0]
+		print("video:", video)
 		tempVideo = editor.VideoFileClip(video)
 		tempVideo = tempVideo.loop(duration=duration.total_seconds())
 		tempVideo = tempVideo.set_fps(30)
