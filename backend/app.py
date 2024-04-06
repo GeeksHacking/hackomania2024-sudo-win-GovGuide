@@ -392,6 +392,12 @@ async def stitchVideos(MovieBody: MovieBody):
         if idx < max_idx:
             continue
 
+        # tempFile = "temp.mp4"
+        # with open(tempFile, 'wb') as f:
+        #     videoResponse = requests.get(video)
+        #     f.write(videoResponse.content)
+        #     f.close()
+
         right_idx = idx
         total_duration = 0
         while (right_idx < len(new_video)) and (new_video[right_idx] == new_video[idx]):
@@ -415,6 +421,7 @@ async def stitchVideos(MovieBody: MovieBody):
             right_idx += 1
 
         max_idx = max(max_idx, right_idx)
+        # os.remove(tempFile)
         videoList.append(tempVideo)
 
     print("Processing Audio & Music")
