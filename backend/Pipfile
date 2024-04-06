@@ -9,6 +9,8 @@ uvicorn = {extras = ["standard"], version = "*"}
 cloudinary = "*"
 python-dotenv = "*"
 elevenlabs = "*"
+whisper-timestamped = "*"
+aiohttp = "*"
 
 [dev-packages]
 
