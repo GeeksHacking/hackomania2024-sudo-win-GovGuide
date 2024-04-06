@@ -1,11 +1,11 @@
 from llm_server import UserData, ScriptGenerator
 
 user_data = UserData(
-	company = "Singapore SME: GreenEats Food Service",
-	work = "GreenEats operates large commercial kitchen, preparing large variety of dishes",
+	name = "Singapore SME: GreenEats Food Service",
 	industry = "Food Service",
-	concerns = "Increasing cost of energy...",
-	needs = "Need to upgrade kitchen",
+	concern = "Increasing cost of energy...",
+	need = "Need to upgrade kitchen",
+	nature = "GreenEats operates large commercial kitchen, preparing large variety of dishes",
 )
 
 script_gen = ScriptGenerator()

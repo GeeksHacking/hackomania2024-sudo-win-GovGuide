@@ -12,6 +12,9 @@ import aiohttp
 import asyncio
 from uuid import uuid4
 
+import os
+os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"
+
 # Cloudinary
 import cloudinary
 import cloudinary.uploader
@@ -265,83 +268,6 @@ def resizer(pic, newsize):
     # arr.reshape(newshape)
     return np.array(resized_pil)
 
-
-# @app.post("/stitchVideos")
-# async def stitchVideos(MovieBody: MovieBody):
-# 	print("Process Scene")
-# 	new_subtitles = []
-# 	new_video = []
-# 	for idx, subtitle in enumerate(MovieBody.subtitles):
-# 		sentences = re.split(r'(?<=[.!?])\s+', subtitle)
-# 		# new_subtitles.pop(idx)
-# 		# popped_vid = new_video.pop(idx)
-# 		for sentence in sentences:
-# 			new_subtitles.append(sentence)
-# 			new_video.append(MovieBody.video[idx])
-# 	print(new_subtitles)
-# 	print(new_video)
-# 	print("Processing SRT")
-# 	srt_file_response = requests.get(MovieBody.srt_file)
-# 	srt_file = srt_file_response.content.decode("utf-8")
-# 	srt_parse = list(srt.parse(srt_file))
-# 	subs = []
-# 	count = 0
-# 	print("Processing Subtitles")
-# 	for srt_content in srt_parse:
-# 		start = srt_content.start
-# 		end = srt_content.end
-# 		duration = end - start
-# 		content = srt_content.content
-# 		sentences = re.split(r'(?<=[.!?])\s+', content)
-# 		for idx, sentence in enumerate(sentences):
-# 			for i in range(count, len(new_subtitles)):
-# 				print(new_subtitles[i], sentence)
-# 				if calculate_text_similarity(new_subtitles[i], sentence) >= 0.7:
-# 					new_sentence = new_subtitles[i]
-# 					sentence_duration = duration * len(new_sentence) / len(content)
-# 					if len(subs) > 0:
-# 						currentStart = subs[-1][0][0]
-# 					else:
-# 						currentStart = timedelta(seconds=0)
-# 					subs.append(([[currentStart, currentStart + sentence_duration], new_sentence]))
-# 					count += 1
-# 					break
-# 	videoList = []
-# 	print(subs, len(subs))
-# 	print("Processing Video")
-# 	print(new_video, len(new_video))
-# 	print(new_subtitles, len(new_subtitles))
-# 	if len(subs) < len(new_video):
-# 		for diff in range(len(new_video) - len(subs)):
-# 			new_sentence = new_subtitles[len(new_video) - diff + 1]
-# 			currentStart = subs[-1][0][0]
-# 			subs.append(([[currentStart, currentStart + len(new_sentence.split())], new_sentence]))
-
-# 	for idx, video in enumerate(new_video):
-# 		print("start", subs[int(idx)][0][0])
-# 		print("end", subs[int(idx)][0][1])
-# 		duration = subs[int(idx)][0][1] - subs[int(idx)][0][0]
-# 		tempVideo = editor.VideoFileClip(video)
-# 		tempVideo = tempVideo.loop(duration=duration.total_seconds())
-# 		tempVideo = tempVideo.set_fps(30)
-# 		tempVideo = tempVideo.fl_image(lambda pic: resizer(pic.astype('uint8'), (1920, 1080)))
-# 		tempVideo = annotate(tempVideo, subs[idx][1], blur=True)
-# 		videoList.append(tempVideo)
-
-# 	print("Processing Audio & Music")
-# 	audio = editor.AudioFileClip(MovieBody.audio)
-# 	final_clip = editor.concatenate_videoclips(videoList)
-# 	final_clip = final_clip.set_audio(audio)
-
-# 	current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-# 	blob_name = f"final_{current_time}_{generate_uuid()}.mp4"
-# 	final_clip.write_videofile(blob_name, fps=30, codec="libx264", audio_codec="aac")
-# 	with open(blob_name, 'rb') as f:
-# 		data = f.read()
-# 		f.close()
-# 	src_url = uploadFile(data, blob_name, folder='final', file_type="video")
-# 	return {"final": src_url}
-
 @app.post("/fakeVideo")
 async def fakeVideo():
     videoArr = [
@@ -383,11 +309,13 @@ async def stitchVideos(MovieBody: MovieBody):
     for srt_content in srt_parse:
         start = srt_content.start
         end = srt_content.end
-        duration = end - start
+        duration = end - start + timedelta(seconds=0.8)
         content = srt_content.content
 
-        min_window += [0] * len(re.split(r'\s+', content))
-        min_window[-1] = [duration, len(re.split(r'\s+', content))]
+        content = re.sub(r'\W', '', content)
+
+        min_window += [0] * len(content)
+        min_window[-1] = [duration, len(content)]
 
     rightest = -1
     for i in range(len(min_window) - 1, -1, -1):
@@ -400,18 +328,21 @@ async def stitchVideos(MovieBody: MovieBody):
     new_video = []
     subs = []
     for idx, subtitle in enumerate(MovieBody.subtitles):
-        dur = 0
-        for i in range(0, len(re.split(r'\s+', subtitle))):
-            data_point = min_window[left_pad + i]
-            dur += data_point[0].total_seconds() / data_point[1]
+        dur = timedelta(seconds=0)
 
-        left_pad += len(re.split(r'\s+', subtitle))
+        alpha_len = len(re.sub(r'\W', '', subtitle))
+        for i in range(alpha_len):
+            if left_pad + i >= len(min_window):
+                break
+            data_point = min_window[left_pad + i]
+            dur += data_point[0] / data_point[1]
+        
+        left_pad += alpha_len
 
         if len(subs) > 0:
             currentStart = subs[-1][0][0]
         else:
-            currentStart = 0
-            # currentStart = timedelta(seconds=0)
+            currentStart = timedelta(seconds=0)
         subs.append(([[currentStart, currentStart + dur], subtitle]))
         new_video.append(MovieBody.video[idx])
 
@@ -429,15 +360,18 @@ async def stitchVideos(MovieBody: MovieBody):
         videoList.append(tempVideo)
 
     print("Processing Audio & Music")
+    print(MovieBody.audio)
     audio = editor.AudioFileClip(MovieBody.audio)
+
     final_clip = editor.concatenate_videoclips(videoList)
     final_clip = final_clip.set_audio(audio)
 
     current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     blob_name = f"final_{current_time}_{generate_uuid()}.mp4"
-    final_clip.write_videofile(blob_name, fps=30, codec="libx264", audio_codec="aac")
+    final_clip.write_videofile(blob_name, fps=30, codec="libx264", audio_codec="aac", temp_audiofile="temp-audio.m4a", remove_temp = True)
     with open(blob_name, 'rb') as f:
         data = f.read()
         f.close()
+
     src_url = uploadFile(data, blob_name, folder='final', file_type="video")
     return {"final": src_url}
