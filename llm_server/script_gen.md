@@ -39,22 +39,19 @@ print(script_json)
     {
       "scene": "exploring ancient ruins",
       "subtitles": [
-        "Embark on a thrilling adventure to discover ancient ruins.",
-        "Uncover the secrets of the past with Singlife as your travel companion."
+        "Embark on a thrilling adventure to discover ancient ruins. Uncover the secrets of the past with Singlife as your travel companion."
       ]
     },
     {
       "scene": "city sightseeing",
       "subtitles": [
-        "Immerse yourself in the vibrant energy of a bustling city.",
-        "Explore iconic landmarks and create unforgettable memories."
+        "Immerse yourself in the vibrant energy of a bustling city. Explore iconic landmarks and create unforgettable memories."
       ]
     },
     {
       "scene": "wildlife safari",
       "subtitles": [
-        "Embark on a wildlife safari and witness nature's wonders up close.",
-        "Let Singlife protect you on your extraordinary journey."
+        "Embark on a wildlife safari and witness nature's wonders up close. Let Singlife protect you on your extraordinary journey."
       ]
     }
   ]
