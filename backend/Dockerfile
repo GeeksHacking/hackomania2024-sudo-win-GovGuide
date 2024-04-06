@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
   libxext6 \
   imagemagick \
   fonts-liberation \
+  ghostscript \
   locales \
   && rm -rf /var/lib/apt/lists/*
 
