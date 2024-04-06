@@ -3,9 +3,9 @@ from dotenv import load_dotenv
 import os
 import json
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 import requests
 from urllib.parse import quote
 import aiohttp
@@ -26,6 +26,14 @@ from fastapi import FastAPI
 
 # Whisper
 import whisper_timestamped as whisper
+
+# Movie Editing
+import srt
+import re
+import difflib
+from moviepy import editor
+from PIL import Image
+import numpy as np
 
 load_dotenv()
 
@@ -184,3 +192,150 @@ async def generate_video_handler(VideoBody: VideoBody):
     tasks = [generate_video(scene) for scene in VideoBody.scene]
     results = await asyncio.gather(*tasks)
     return {"video": [url for urls in results for url in urls]}
+
+
+class MovieBody(BaseModel):
+    audio: str
+    srt_file: str
+    video: List[str]
+    subtitles: List[str]
+
+
+def split_text(text: str):
+    words = text.split()
+    lines = []
+    current_line = ''
+
+    for word in words:
+        if len(current_line + ' ' + word) <= 50:
+            if current_line == '':
+                current_line = word
+            else:
+                current_line += ' ' + word
+        else:
+            lines.append(current_line)
+            current_line = word
+
+    if current_line:
+        lines.append(current_line)
+
+    return '\n'.join(lines)
+
+
+def annotate(clip, txt:str, txt_color="white", fontsize=75, font="Arial-Bold", blur=False):
+    txt = split_text(txt)
+    txtclip = editor.TextClip(txt, fontsize=fontsize, font=font, color=txt_color)
+    txtclip = txtclip.set_pos(("center", clip.h - txtclip.h - 150))
+    if blur:
+        blur_size = 5
+        blur_txtclip = editor.TextClip(txt, fontsize=fontsize, font=font, color="black")
+        blur_txtclip = blur_txtclip.set_pos(
+            (
+                (clip.w - blur_txtclip.w) // 2 + blur_size,
+                clip.h - blur_txtclip.h - (150 - blur_size),
+            )
+        )
+        cvc = editor.CompositeVideoClip([clip, blur_txtclip, txtclip])
+    else:
+        cvc = editor.CompositeVideoClip([clip, txtclip])
+    return cvc.set_duration(clip.duration)
+
+
+def calculate_text_similarity(text1, text2):
+    # Create a Differ instance
+    differ = difflib.Differ()
+
+    # Compare the texts
+    diff = differ.compare(text1.split(), text2.split())
+
+    # Calculate the similarity ratio
+    similarity_ratio = difflib.SequenceMatcher(None, text1, text2).ratio()
+
+    return similarity_ratio
+
+
+def resizer(pic, newsize):
+    newsize = list(map(int, newsize))[::-1]
+    shape = pic.shape
+
+    pilim = Image.fromarray(pic)
+    resized_pil = pilim.resize(newsize[::-1], Image.LANCZOS)
+    # arr = np.fromstring(resized_pil.tostring(), dtype='uint8')
+    # arr.reshape(newshape)
+    return np.array(resized_pil)
+
+
+@app.post("/stitchVideos")
+async def stitchVideos(MovieBody: MovieBody):
+    print("Process Scene")
+    new_subtitles = []
+    new_video = []
+    for idx, subtitle in enumerate(MovieBody.subtitles):
+        sentences = re.split(r'(?<=[.!?])\s+', subtitle)
+        # new_subtitles.pop(idx)
+        # popped_vid = new_video.pop(idx)
+        for sentence in sentences:
+            new_subtitles.append(sentence)
+            new_video.append(MovieBody.video[idx])
+    print(new_subtitles)
+    print(new_video)
+    print("Processing SRT")
+    srt_file_response = requests.get(MovieBody.srt_file)
+    srt_file = srt_file_response.content.decode("utf-8")
+    srt_parse = list(srt.parse(srt_file))
+    subs = []
+    count = 0
+    print("Processing Subtitles")
+    for srt_content in srt_parse:
+        start = srt_content.start
+        end = srt_content.end
+        duration = end - start
+        content = srt_content.content
+        sentences = re.split(r'(?<=[.!?])\s+', content)
+        for idx, sentence in enumerate(sentences):
+            for i in range(count, len(new_subtitles)):
+                print(new_subtitles[i], sentence)
+                if calculate_text_similarity(new_subtitles[i], sentence) >= 0.7:
+                    new_sentence = new_subtitles[i]
+                    sentence_duration = duration * len(new_sentence) / len(content)
+                    if len(subs) > 0:
+                        currentStart = subs[-1][0][0]
+                    else:
+                        currentStart = timedelta(seconds=0)
+                    subs.append(([[currentStart, currentStart + sentence_duration], new_sentence]))
+                    count += 1
+                    break
+    videoList = []
+    print(subs, len(subs))
+    print("Processing Video")
+    print(new_video, len(new_video))
+    print(new_subtitles, len(new_subtitles))
+    if len(subs) < len(new_video):
+        for diff in range(len(new_video) - len(subs)):
+            new_sentence = new_subtitles[len(new_video) - diff + 1]
+            currentStart = subs[-1][0][0]
+            subs.append(([[currentStart, currentStart + len(new_sentence.split())], new_sentence]))
+    for idx, video in enumerate(new_video):
+        print("start", subs[int(idx)][0][0])
+        print("end", subs[int(idx)][0][1])
+        duration = subs[int(idx)][0][1] - subs[int(idx)][0][0]
+        tempVideo = editor.VideoFileClip(video)
+        tempVideo = tempVideo.loop(duration=duration.total_seconds())
+        tempVideo = tempVideo.set_fps(30)
+        tempVideo = tempVideo.fl_image(lambda pic: resizer(pic.astype('uint8'), (1920, 1080)))
+        tempVideo = annotate(tempVideo, subs[idx][1], blur=True)
+        videoList.append(tempVideo)
+
+    print("Processing Audio & Music")
+    audio = editor.AudioFileClip(MovieBody.audio)
+    final_clip = editor.concatenate_videoclips(videoList)
+    final_clip = final_clip.set_audio(audio)
+
+    current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    blob_name = f"final_{current_time}_{generate_uuid()}.mp4"
+    final_clip.write_videofile(blob_name, fps=30, codec="libx264", audio_codec="aac")
+    with open(blob_name, 'rb') as f:
+        data = f.read()
+        f.close()
+    src_url = uploadFile(data, blob_name, folder='final', file_type="video")
+    return {"final": src_url}

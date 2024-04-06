@@ -11,6 +11,9 @@ python-dotenv = "*"
 elevenlabs = "*"
 whisper-timestamped = "*"
 aiohttp = "*"
+srt = "*"
+pillow = "*"
+moviepy = "*"
 
 [dev-packages]
 
