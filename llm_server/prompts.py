@@ -32,15 +32,13 @@ This is the business information: \"\"\"{info}\"\"\"
 This is the government scheme/grant: \"\"\"{scheme}\"\"\"
 """
 
-GENERATE_DRAFT_SCRIPT = """Imagine you are a marketing professional that writes video scripts. You help promote schemes/grants to businesses in a convincing fashion.
-
-You will be given two pieces of information: the business information and a list of explanations as detailing why the respective specific government scheme is relevant to the business.
+GENERATE_DRAFT_SCRIPT = """You will be given two pieces of information: the business information and a list of explanations as detailing why the respective specific government scheme is relevant to the business.
 
 This is the business information: \"\"\"{info}\"\"\"
 
 Explaining some possible schemes for the business: \"\"\"{explanations}\"\"\"
 
-Referring to the many schemes above, write the content of a script to share on the scheme and convince the business to apply for it (30-45 seconds of content). Remember you are talking to them directly. Remember to consider all the above schemes mentioned.
+Referring to the many schemes above, promote the scheme and convince the business to apply for it (30-45 talking seconds of content). Remember you are talking to them directly. Remember to consider all the above schemes mentioned. Generate enough content for 30 to 40 seconds of talking. Remember to include details and BE SPECIFIC. Make sure it is relevant to the business! Don't use placeholder numbers like X%.
 """
 
 ENHANCE_SCRIPT_CHECK = """Imagine you are a marketing professional. You will be given business information, a list of schemes and a draft script.
@@ -54,7 +52,7 @@ This is the draft script: \"\"\"{draft_script}\"\"\"
 List out a list of considerations and changes you would make to further enhance the draft script.
 """
 
-ENHANCE_SCRIPT_WRITE = """Imagine you are a marketing professional. You will be given a draft script and list of recommended potential improvements.
+ENHANCE_SCRIPT_WRITE = """Imagine you are a marketing professional. You will be given a draft narrator's script and list of recommended potential improvements.
 
 Your goal is to promote these schemes/grants to businesses.
 
@@ -64,14 +62,14 @@ This is the list of improvements: \"\"\"{improvements}\"\"\"
 Modify the draft script into a final version that is better. Make sure the wording talks DIRECTLY to user.
 """
 
-FORMAT_SCRIPT = """Imagine you are a marketing professional. You will be given a script and need to cut it into JSON format, and think of relevant scenes.
+FORMAT_SCRIPT = """You will be given a script and need to parse into JSON format, and think of relevant scenes.
 
-For instance, here is an example:
+Follow this format specifically. Note that each scene is associated with several sentences:
 ```
-{{"list_of_scenes":[{{"scene": "family trip skiing","subtitles": ["Are you ready for an unforgettable family ski trip","to Japan? Ensure your adventure is worry-free with Singlife's travel insurance!"]}},{{"scene": "insurance policy document close up","subtitles": ["Our comprehensive travel insurance plans cater to your","needs. Peace of mind throughout your journey."]}},...}}
+{{"list_of_scenes":[{{"scene": "family trip skiing","subtitles": ["Are you ready for an unforgettable family ski trip to Japan? Ensure your adventure is worry-free with Singlife's travel insurance!"]}}]}}
 ```
 
 This is the script: \"\"\"{script}\"\"\"
 
-Parse the script to follow the JSON format above, as well as ensure visual generic image scenes such as "family trip skiing". Remember to follow the script wording WORD FOR WORD. Don't miss out on any content. Scenes should be generic and only 3 words.
+Parse the script to follow the JSON format above, as well as ensure visual generic image scenes such as "family trip skiing", NO ACRYONYMS KEEP IT SIMPLE. Remember to follow the script WORD FOR WORD. Scenes should be generic and only 3 words. Populate the list of scenes.
 """
