@@ -269,10 +269,10 @@ const Prompt = () => {
       <Card className="min-w-[350px] flex mx-auto max-w-[750px] flex-col md:flex-row">
         <div className="min-w-[350px] max-w-[350px] w-full">
           <CardHeader>
-            <CardTitle>SINGen - Generate Infomercial</CardTitle>
+            <CardTitle>GovGuide - Guiding your business to success.</CardTitle>
             <CardDescription>
               Our state of the art AI will generate an infomercial based on your
-              prompt and the custom knowledge base from Singlife documents
+              prompt to guide you through your business journey.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -286,7 +286,7 @@ const Prompt = () => {
               }}
             >
               <Input
-                placeholder="Name of Client"
+                placeholder="Name"
                 value={name}
                 onChange={(e) => {
                   setName(e.target.value);
@@ -326,7 +326,7 @@ const Prompt = () => {
                 value={lifestyle}
               />
 
-              <Button disabled={loading} className="mt-4" type="submit">
+              <Button disabled={loading} className="mt-4 text-white" type="submit">
                 {loading && <Loader2 className="mr-2 animate-spin" />}
                 Generate
                 {!loading && <ChevronRight />}
