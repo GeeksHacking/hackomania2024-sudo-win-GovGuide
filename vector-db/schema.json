@@ -1,7 +1,7 @@
 {
     "classes": [
         {
-            "class": "Schemes",
+            "class": "scheme_chunks",
             "description": "Singapore Government Schemes in chunks",
             "vectorizer": "text2vec-openai",
             "moduleConfig": {
@@ -16,6 +16,50 @@
                     "name": "content_chunks",
                     "dataType": ["text"],
                     "description": "Scheme content"
+                },
+                {
+                    "name": "title",
+                    "dataType": ["text"],
+                    "description": "Title of the scheme",
+                    "moduleConfig": {
+                        "text2vec-openai": {
+                            "skip": true
+                        }
+                    }
+                },
+                {
+                    "name": "source",
+                    "dataType": ["text"],
+                    "description": "URL source of scheme",
+                    "moduleConfig": {
+                        "text2vec-openai": {
+                            "skip": true
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "class": "whole_scheme",
+            "description": "Singapore Government Schemes in chunks",
+            "vectorizer": "text2vec-openai",
+            "moduleConfig": {
+                "text2vec-openai": {
+                    "model": "ada",
+                    "modelVersion": "002",
+                    "type": "text"
+                }
+            },
+            "properties": [
+                {
+                    "name": "content",
+                    "dataType": ["text"],
+                    "description": "Scheme content",
+                    "moduleConfig": {
+                        "text2vec-openai": {
+                            "skip": true
+                        }
+                    }
                 },
                 {
                     "name": "title",
