@@ -226,10 +226,15 @@ def split_text(text: str):
     return '\n'.join(lines)
 
 
-def annotate(clip, txt: str, txt_color="white", fontsize=75, font="Arial-Bold", blur=False):
+def annotate(clip, txt: str, txt_color="white", fontsize=75, font="Arial-Bold", blur=False, start = 0, duration = None):
     txt = split_text(txt)
     txtclip = editor.TextClip(txt, fontsize=fontsize, font=font, color=txt_color)
     txtclip = txtclip.set_pos(("center", clip.h - txtclip.h - 150))
+    txtclip = txtclip.set_start(start + 0.001)
+
+    if duration is not None:
+        txtclip = txtclip.set_duration(duration)
+
     if blur:
         blur_size = 5
         blur_txtclip = editor.TextClip(txt, fontsize=fontsize, font=font, color="black")
@@ -239,6 +244,10 @@ def annotate(clip, txt: str, txt_color="white", fontsize=75, font="Arial-Bold", 
                 clip.h - blur_txtclip.h - (150 - blur_size),
             )
         )
+        blur_txtclip = blur_txtclip.set_start(start + 0.001)
+        if duration is not None:
+            blur_txtclip = blur_txtclip.set_duration(duration)
+
         cvc = editor.CompositeVideoClip([clip, blur_txtclip, txtclip])
     else:
         cvc = editor.CompositeVideoClip([clip, txtclip])
@@ -298,9 +307,32 @@ async def fakeVideo():
     src_url = uploadFile(data, blob_name, folder='final', file_type="video")
     return {"final": src_url}
 
+def cut_sentences(movie_body: MovieBody):
+    print("Before:", movie_body)
+    new_subtitles = []
+    new_videos = []
+    for vid, sub in zip(movie_body.video, movie_body.subtitles):
+        cur_len = 0
+        prev_i = 0
+        sub_split = sub.split(' ')
+        for i, word in enumerate(sub_split):
+            cur_len += len(word)
+            if (i == len(sub_split) - 1) or (i < len(sub_split) - 1 and cur_len + len(sub_split[i + 1]) > 70):
+                new_subtitles.append(' '.join(sub_split[prev_i:i + 1]))
+                new_videos.append(vid)
+                prev_i = i + 1
+                cur_len = 0
+
+    movie_body.video = new_videos
+    movie_body.subtitles = new_subtitles
+
+    return movie_body
 
 @app.post("/stitchVideos")
 async def stitchVideos(MovieBody: MovieBody):
+    MovieBody = cut_sentences(MovieBody)
+    print(MovieBody)
+
     srt_file_response = requests.get(MovieBody.srt_file)
     srt_file = srt_file_response.content.decode("utf-8")
     srt_parse = list(srt.parse(srt_file))
@@ -309,7 +341,8 @@ async def stitchVideos(MovieBody: MovieBody):
     for srt_content in srt_parse:
         start = srt_content.start
         end = srt_content.end
-        duration = end - start + timedelta(seconds=0.8)
+        duration = end - start
+
         content = srt_content.content
 
         content = re.sub(r'\W', '', content)
@@ -343,20 +376,45 @@ async def stitchVideos(MovieBody: MovieBody):
             currentStart = subs[-1][0][0]
         else:
             currentStart = timedelta(seconds=0)
+
+        if dur.total_seconds() < 3:
+            dur += timedelta(seconds=0.7)
+        else:
+            dur += timedelta(seconds=0.3)
+
         subs.append(([[currentStart, currentStart + dur], subtitle]))
         new_video.append(MovieBody.video[idx])
 
     videoList = []
 
+    max_idx = 0
     for idx, video in enumerate(new_video):
-        print("start", subs[int(idx)][0][0])
-        print("end", subs[int(idx)][0][1])
+        if idx < max_idx:
+            continue
+
+        right_idx = idx
+        total_duration = 0
+        while (right_idx < len(new_video)) and (new_video[right_idx] == new_video[idx]):
+            total_duration += subs[right_idx][0][1].total_seconds()
+            right_idx += 1
+
         duration = subs[int(idx)][0][1] - subs[int(idx)][0][0]
         tempVideo = editor.VideoFileClip(video)
-        tempVideo = tempVideo.loop(duration=duration.total_seconds())
+        tempVideo = tempVideo.loop(duration=total_duration)
         tempVideo = tempVideo.set_fps(30)
         tempVideo = tempVideo.fl_image(lambda pic: resizer(pic.astype('uint8'), (1920, 1080)))
-        tempVideo = annotate(tempVideo, subs[idx][1], blur=True)
+
+        right_idx = idx
+        total_duration = 0
+        while (right_idx < len(new_video)) and (new_video[right_idx] == new_video[idx]):
+            print("start", subs[int(right_idx)][0][0])
+            print("sub:", subs[int(right_idx)][1])
+            tempVideo = annotate(tempVideo, subs[right_idx][1], blur=True, start = total_duration, duration = subs[right_idx][0][1].total_seconds())
+            print("end", subs[int(right_idx)][0][1])
+            total_duration += subs[right_idx][0][1].total_seconds()
+            right_idx += 1
+
+        max_idx = max(max_idx, right_idx)
         videoList.append(tempVideo)
 
     print("Processing Audio & Music")
