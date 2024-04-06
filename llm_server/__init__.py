@@ -1,2 +1,2 @@
-from main import *
-from prompts import *
+from .main import *
+from .prompts import *
