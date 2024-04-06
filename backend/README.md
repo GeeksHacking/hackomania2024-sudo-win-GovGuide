@@ -17,5 +17,18 @@ pipenv run uvicorn app:app --reload
 
 # Docker
 ```bash
-docker build backend .
+docker build -t backend .
+```
+
+```bash
+docker login govguide.azurecr.io
+```
+
+```bash
+docker tag backend govguide.azurecr.io/backend
+docker push govguide.azurecr.io/backend
+```
+
+```bash
+docker pull govguide.azurecr.io/backend
 ```

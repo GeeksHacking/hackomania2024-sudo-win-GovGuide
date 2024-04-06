@@ -418,6 +418,11 @@ async def stitchVideos(MovieBody: MovieBody):
     videoList = []
 
     for idx, video in enumerate(new_video):
+        tempFile = "temp.mp4"
+        with open(tempFile, 'wb') as f:
+            videoResponse = requests.get(video)
+            f.write(videoResponse.content)
+            f.close()
         print("start", subs[int(idx)][0][0])
         print("end", subs[int(idx)][0][1])
         duration = subs[int(idx)][0][1] - subs[int(idx)][0][0]
@@ -426,6 +431,7 @@ async def stitchVideos(MovieBody: MovieBody):
         tempVideo = tempVideo.set_fps(30)
         tempVideo = tempVideo.fl_image(lambda pic: resizer(pic.astype('uint8'), (1920, 1080)))
         tempVideo = annotate(tempVideo, subs[idx][1], blur=True)
+        os.remove(tempFile)
         videoList.append(tempVideo)
 
     print("Processing Audio & Music")
