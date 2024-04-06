@@ -77,6 +77,8 @@ def uploadFile(file: bytes, file_name: str, folder: str = "", file_type: str = '
 	'''
 	Use Cloudinary Upload to upload
 	'''
+	if "." in file_name:
+		file_name = file_name.split(".")[0]
 	file_upload = cloudinary.uploader.upload(
 		file, public_id=file_name, unique_filename=False, overwrite=True, folder=folder, resource_type=file_type
 	)
@@ -221,7 +223,7 @@ def split_text(text: str):
 	return '\n'.join(lines)
 
 
-def annotate(clip, txt:str, txt_color="white", fontsize=75, font="Arial-Bold", blur=False):
+def annotate(clip, txt: str, txt_color="white", fontsize=75, font="Arial-Bold", blur=False):
 	txt = split_text(txt)
 	txtclip = editor.TextClip(txt, fontsize=fontsize, font=font, color=txt_color)
 	txtclip = txtclip.set_pos(("center", clip.h - txtclip.h - 150))
@@ -314,7 +316,7 @@ def resizer(pic, newsize):
 # 			new_sentence = new_subtitles[len(new_video) - diff + 1]
 # 			currentStart = subs[-1][0][0]
 # 			subs.append(([[currentStart, currentStart + len(new_sentence.split())], new_sentence]))
-			
+
 # 	for idx, video in enumerate(new_video):
 # 		print("start", subs[int(idx)][0][0])
 # 		print("end", subs[int(idx)][0][1])
@@ -340,6 +342,32 @@ def resizer(pic, newsize):
 # 	src_url = uploadFile(data, blob_name, folder='final', file_type="video")
 # 	return {"final": src_url}
 
+@app.post("/fakeVideo")
+async def fakeVideo():
+	video = [
+		"http://res.cloudinary.com/dhm7d2jq6/video/upload/v1712407042/video/commercial%20kitchen%20upgrade_2024-04-06_20-37-15_b728cba9-0311-4331-a719-68d92540902b.mp4",
+		"http://res.cloudinary.com/dhm7d2jq6/video/upload/v1712407094/video/energy-efficient%20equipment%20showcase_2024-04-06_20-38-03_7bdf3352-6090-4386-9c2c-1dfa086c33a3.mp4",
+	]
+	videoList = []
+	test = requests.get(video[0])
+	print(test.content)
+	for idx, video in enumerate(video):
+		tempVideo = editor.VideoFileClip(video)
+		tempVideo = tempVideo.loop(duration=3)
+		tempVideo = tempVideo.set_fps(30)
+		tempVideo = tempVideo.fl_image(lambda pic: resizer(pic.astype('uint8'), (1920, 1080)))
+		videoList.append(tempVideo)
+	final_clip = editor.concatenate_videoclips(videoList)
+
+	current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+	blob_name = f"final_{current_time}_{generate_uuid()}.mp4"
+	final_clip.write_videofile(blob_name, fps=30, codec="libx264", audio_codec="aac")
+	with open(blob_name, 'rb') as f:
+		data = f.read()
+		f.close()
+	src_url = uploadFile(data, blob_name, folder='final', file_type="video")
+	return {"final": src_url}
+
 
 @app.post("/stitchVideos")
 async def stitchVideos(MovieBody: MovieBody):
@@ -356,7 +384,7 @@ async def stitchVideos(MovieBody: MovieBody):
 
 		min_window += [0] * len(re.split(r'\s+', content))
 		min_window[-1] = [duration, len(re.split(r'\s+', content))]
-	
+
 	rightest = -1
 	for i in range(len(min_window) - 1, -1, -1):
 		if min_window[i] == 0:
@@ -380,17 +408,17 @@ async def stitchVideos(MovieBody: MovieBody):
 		if len(subs) > 0:
 			currentStart = subs[-1][0][0]
 		else:
-			currentStart = timedelta(seconds=0)
+			currentStart = 0
+			# currentStart = timedelta(seconds=0)
 		subs.append(([[currentStart, currentStart + dur], subtitle]))
 		new_video.append(MovieBody.video[idx])
 
 	videoList = []
-			
+
 	for idx, video in enumerate(new_video):
 		print("start", subs[int(idx)][0][0])
 		print("end", subs[int(idx)][0][1])
 		duration = subs[int(idx)][0][1] - subs[int(idx)][0][0]
-		print("video:", video)
 		tempVideo = editor.VideoFileClip(video)
 		tempVideo = tempVideo.loop(duration=duration.total_seconds())
 		tempVideo = tempVideo.set_fps(30)
