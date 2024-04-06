@@ -30,10 +30,10 @@ const Prompt = () => {
   const [loading, setLoading] = useState(false);
   const [textContent, setTextContent] = useState("");
   const [name, setName] = useState<string>("");
-  const [age, setAge] = useState<string>("");
+  const [industry, setIndustry] = useState<string>("");
   const [concerns, setConcerns] = useState<string>("");
   const [needs, setNeeds] = useState<string>("");
-  const [lifestyle, setLifestyle] = useState<string>("");
+  const [nature, setNature] = useState<string>("");
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const textAreaNeedsRef = useRef<HTMLTextAreaElement>(null);
   const textAreaLifestyleRef = useRef<HTMLTextAreaElement>(null);
@@ -42,9 +42,9 @@ const Prompt = () => {
 
   useAutosizeTextArea(textAreaRef.current, concerns);
   useAutosizeTextArea(textAreaNeedsRef.current, needs);
-  useAutosizeTextArea(textAreaLifestyleRef.current, lifestyle);
+  useAutosizeTextArea(textAreaLifestyleRef.current, nature);
 
-  const handleChange = (evt: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleConcernsChange = (evt: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = evt.target;
     setConcerns(value);
   };
@@ -54,24 +54,19 @@ const Prompt = () => {
     setNeeds(value);
   };
 
-  const handleLifestyleChange = (
+  const handleIndustryChange = (
     evt: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
     const { value } = evt.target;
-    setLifestyle(value);
+    setIndustry(value);
   };
 
-  const handleAgeChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = evt.target.value;
-
-    // Check if the entered value is a valid number
-    if (!isNaN(Number(inputValue))) {
-      setAge(inputValue);
-    } else {
-      // If not a valid number, set age to an empty string
-      setAge("");
-    }
-  };
+  const handleNatureChange = (
+    evt: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const { value } = evt.target;
+    setNature(value);
+  }
 
   const formatSources = async (rawSource: Source[]) => {
     let output: string[] = [];
@@ -233,9 +228,9 @@ const Prompt = () => {
         `${import.meta.env.VITE_BACKEND_FASTAPI}/query`,
         {
           name,
-          age: parseInt(age),
+          industry,
           needs,
-          lifestyle,
+          nature,
           concerns,
         },
         {
@@ -292,16 +287,19 @@ const Prompt = () => {
                   setName(e.target.value);
                 }}
               />
-              <Input
-                placeholder="Age of Client (Optional)"
-                type="number"
-                value={age}
-                onChange={handleAgeChange}
+              <textarea
+                id="prompt-text"
+                className="max-h-[150px] resize-none flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                onChange={handleIndustryChange}
+                placeholder="Industry"
+                ref={textAreaRef}
+                rows={1}
+                value={concerns}
               />
               <textarea
                 id="prompt-text"
                 className="max-h-[150px] resize-none flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                onChange={handleChange}
+                onChange={handleConcernsChange}
                 placeholder="Concerns"
                 ref={textAreaRef}
                 rows={1}
@@ -311,7 +309,7 @@ const Prompt = () => {
                 id="prompt-text"
                 className="max-h-[150px] resize-none flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 onChange={handleNeedsChange}
-                placeholder="Needs (Optional)"
+                placeholder="Needs"
                 ref={textAreaNeedsRef}
                 rows={1}
                 value={needs}
@@ -319,11 +317,11 @@ const Prompt = () => {
               <textarea
                 id="prompt-text"
                 className="max-h-[150px] resize-none flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                onChange={handleLifestyleChange}
-                placeholder="Lifestyle (Optional)"
+                onChange={handleNatureChange}
+                placeholder="Nature of work"
                 ref={textAreaLifestyleRef}
                 rows={1}
-                value={lifestyle}
+                value={nature}
               />
 
               <Button disabled={loading} className="mt-4 text-white" type="submit">
