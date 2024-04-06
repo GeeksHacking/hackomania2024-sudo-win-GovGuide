@@ -32,7 +32,7 @@ def split_text(text, max_ = 15, min_ = 5):
 
 	return new_content
 
-class UserData:
+class UserData(BaseModel):
 	# def __init__(self):
 	# 	pass
 	name: str
