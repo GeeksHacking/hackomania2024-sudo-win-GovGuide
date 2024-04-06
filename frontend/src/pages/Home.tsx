@@ -8,7 +8,7 @@ function Home() {
         const updateNavbarHeight = () => {
             const navbar = document.querySelector('.navbar');
             if (navbar) {
-                setNavbarHeight(navbar.offsetHeight);
+                setNavbarHeight(navbar.clientHeight);
             }
         };
 
@@ -21,8 +21,8 @@ function Home() {
 
     // The style object for the container
     const containerStyle = {
-        minHeight: `calc(100vh - ${navbarHeight}px)`,
-        backgroundImage: 'url("../public/")', 
+        minHeight: `calc(100vh - ${navbarHeight + 28}px)`,
+        backgroundImage: 'url("/stockphoto.jpg")', 
         backgroundSize: 'cover', 
         backgroundPosition: 'center', 
     };
