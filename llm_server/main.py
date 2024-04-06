@@ -103,6 +103,8 @@ class ScriptGenerator:
 				)
 			)
 		]).content
+
+		out = out.replace('\n', ' ')
 		print("enhanced:", out)
 		return out
 
