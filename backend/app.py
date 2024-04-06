@@ -344,20 +344,24 @@ def resizer(pic, newsize):
 
 @app.post("/fakeVideo")
 async def fakeVideo():
-	video = [
-		"http://res.cloudinary.com/dhm7d2jq6/video/upload/v1712407042/video/commercial%20kitchen%20upgrade_2024-04-06_20-37-15_b728cba9-0311-4331-a719-68d92540902b.mp4",
-		"http://res.cloudinary.com/dhm7d2jq6/video/upload/v1712407094/video/energy-efficient%20equipment%20showcase_2024-04-06_20-38-03_7bdf3352-6090-4386-9c2c-1dfa086c33a3.mp4",
-	]
-	videoList = []
-	test = requests.get(video[0])
-	print(test.content)
-	for idx, video in enumerate(video):
-		tempVideo = editor.VideoFileClip(video)
-		tempVideo = tempVideo.loop(duration=3)
-		tempVideo = tempVideo.set_fps(30)
-		tempVideo = tempVideo.fl_image(lambda pic: resizer(pic.astype('uint8'), (1920, 1080)))
-		videoList.append(tempVideo)
-	final_clip = editor.concatenate_videoclips(videoList)
+    videoArr = [
+        "http://res.cloudinary.com/dhm7d2jq6/video/upload/v1712407042/video/commercial%20kitchen%20upgrade_2024-04-06_20-37-15_b728cba9-0311-4331-a719-68d92540902b.mp4",
+        "http://res.cloudinary.com/dhm7d2jq6/video/upload/v1712407094/video/energy-efficient%20equipment%20showcase_2024-04-06_20-38-03_7bdf3352-6090-4386-9c2c-1dfa086c33a3.mp4",
+    ]
+    videoList = []
+    for idx, video in enumerate(videoArr):
+        tempFile = "temp.mp4"
+        with open(tempFile,'wb') as f:
+            videoResponse = requests.get(video)
+            f.write(videoResponse.content)
+            f.close()
+        tempVideo = editor.VideoFileClip(tempFile)
+        tempVideo = tempVideo.loop(duration=3)
+        tempVideo = tempVideo.set_fps(30)
+        tempVideo = tempVideo.fl_image(lambda pic: resizer(pic.astype('uint8'), (1920, 1080)))
+        videoList.append(tempVideo)
+        os.remove(tempFile)
+    final_clip = editor.concatenate_videoclips(videoList)
 
 	current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 	blob_name = f"final_{current_time}_{generate_uuid()}.mp4"
@@ -392,18 +396,16 @@ async def stitchVideos(MovieBody: MovieBody):
 		else:
 			rightest = min_window[i]
 
-	left_pad = 0
-	new_video = []
-	subs = []
-	for idx, subtitle in enumerate(MovieBody.subtitles):
-		dur = timedelta(seconds=0)
-		for i in range(0, len(re.split(r'\s+', subtitle))):
-			if left_pad + i >= len(min_window):
-				break
-			data_point = min_window[left_pad + i]
-			dur += data_point[0] / data_point[1]
-		
-		left_pad += len(re.split(r'\s+', subtitle))
+    left_pad = 0
+    new_video = []
+    subs = []
+    for idx, subtitle in enumerate(MovieBody.subtitles):
+        dur = 0
+        for i in range(0, len(re.split(r'\s+', subtitle))):
+            data_point = min_window[left_pad + i]
+            dur += data_point[0].total_seconds() / data_point[1]
+
+        left_pad += len(re.split(r'\s+', subtitle))
 
 		if len(subs) > 0:
 			currentStart = subs[-1][0][0]
