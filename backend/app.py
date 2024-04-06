@@ -377,10 +377,8 @@ async def stitchVideos(MovieBody: MovieBody):
         else:
             currentStart = timedelta(seconds=0)
 
-        if dur.total_seconds() < 3:
-            dur += timedelta(seconds=0.7)
-        else:
-            dur += timedelta(seconds=0.3)
+        if dur.total_seconds() <= 3:
+            dur += timedelta(seconds=0.5)
 
         subs.append(([[currentStart, currentStart + dur], subtitle]))
         new_video.append(MovieBody.video[idx])
