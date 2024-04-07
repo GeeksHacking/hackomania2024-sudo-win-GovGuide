@@ -76,5 +76,15 @@ Parse the script to follow the JSON format above, as well as ensure visual gener
 
 GET_RESOURCES = """You will be given information about business, a list of explanations of why schemes are relevant to a business, a script that, and a list of URLs corresponding to the schemes in the list of explanations
 
-WIP
+Information about business: {info}
+Explanations of scheme and business: {explanations}
+Script: {script}
+List of URLs according to the schemes in explanations: {URLs}
+
+Firstly, list 
+Follow this format:
+```
+```
+
+Output markdown directly:
 """

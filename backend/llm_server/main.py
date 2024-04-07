@@ -172,11 +172,11 @@ class ScriptGenerator:
 		return out
 
 	def get_sources(self, user_data: UserData, script: str, explanations: List[str], urls: List[str]) -> str:
-		sources = self.chat4.invoke(
+		 = self.chat4.invoke(
 			[
 				HumanMessage(
 					content=GET_RESOURCES.format(
-						info=user_data, explanations=explanations, script = script 
+						info=user_data, explanations=explanations, script = script, urls = urls
 					)
 				)
 			]
@@ -185,10 +185,14 @@ class ScriptGenerator:
 		return sources
 
 	def __call__(self, user_data) -> str:
-		relevant_docs: List[str] = self.get_relevant_docs(user_data)
+		relevant_tuples: List[List[str, str]] = self.get_relevant_docs(user_data)
+		relevant_docs = [doc for doc, url in relevant_tuples]
+		relevant_title = [doc for doc, url in relevant_tuples]
+		relevant_urls = [url for doc, url in relevant_tuples]
+
 		script, explanations = self.generate_script(user_data, relevant_docs)
 		script: str = self.enhance_script(user_data, script, explanations)
-		sources: str = self.get_sources(user_data, script, explanations)
+		sources: str = self.get_sources(user_data, script, explanations, relevant_urls)
 
 		script: str = self.format_script(script)
 
