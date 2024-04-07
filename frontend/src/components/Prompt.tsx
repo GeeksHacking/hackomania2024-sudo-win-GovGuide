@@ -16,10 +16,10 @@ import TypewriterMarkdown from "./Typewriter";
 
 import useAutosizeTextArea from "./ui/useAutosizeTextArea";
 
-interface Source {
-  url: string;
-  title: string;
-}
+// interface Source {
+//   url: string;
+//   title: string;
+// }
 
 interface Scene {
   scene: string;
@@ -44,7 +44,9 @@ const Prompt = () => {
   useAutosizeTextArea(textAreaNeedsRef.current, needs);
   useAutosizeTextArea(textAreaLifestyleRef.current, nature);
 
-  const handleConcernsChange = (evt: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleConcernsChange = (
+    evt: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
     const { value } = evt.target;
     setConcerns(value);
   };
@@ -61,25 +63,27 @@ const Prompt = () => {
     setIndustry(value);
   };
 
-  const handleNatureChange = (
-    evt: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
+  const handleNatureChange = (evt: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = evt.target;
     setNature(value);
-  }
-
-  const formatSources = async (rawSource: Source[]) => {
-    let output: string[] = [];
-    output.push(`**Sources:**`);
-
-    rawSource.forEach(async (e: Source, idx: number) => {
-      if (idx < 3) {
-        output.push(`${e.title}:`);
-        output.push(`[${e.url}](${e.url})`);
-      }
-    });
-    return setTextContent(output.join("\n\n"));
   };
+
+  const formatSources = async (sourceMarkdown: string) => {
+    return setTextContent(sourceMarkdown);
+  };
+
+  // const formatSources = async (rawSource: Source[]) => {
+  //   let output: string[] = [];
+  //   output.push(`**Sources:**`);
+
+  //   rawSource.forEach(async (e: Source, idx: number) => {
+  //     if (idx < 3) {
+  //       output.push(`${e.title}:`);
+  //       output.push(`[${e.url}](${e.url})`);
+  //     }
+  //   });
+  //   return setTextContent(output.join("\n\n"));
+  // };
 
   async function generateVideo(scenesList: Scene[]) {
     // let audioPromise =
@@ -178,51 +182,48 @@ const Prompt = () => {
 
       if (name == "Alan") {
         setTimeout(async () => {
-          await formatSources([
-            {
-              url: "https://singlife.com/content/dam/public/sg/documents/life/life-and-health-savings-retirement-forms/for-new-business-and-underwriting-forms-and-questionnaires/Q21_Adviser_Financial_Questionnaire_for_Business_Cover.pdf",
-              title: "Q21_Adviser_Financial_Questionnaire_for_Business_Cover",
-            },
-            {
-              url: "https://singlife.com/content/dam/public/sg/documents/life/life-and-health-savings-retirement-forms/for-new-business-and-underwriting-forms-and-questionnaires/Q38_Occupational_Supplementary_Questionnaire.pdf",
-              title: "Q38_Occupational_Supplementary_Questionnaire",
-            },
-            {
-              url: "https://singlife.com/content/dam/public/sg/documents/life/life-and-health-savings-retirement-forms/for-new-business-and-underwriting-forms-and-questionnaires/Q18_Self-Employed_Supplementary_Questionnaire.pdf",
-              title: "Q18_Self-Employed_Supplementary_Questionnaire",
-            },
-          ]);
+          await formatSources(`##### Sources
+1. Energy Efficient Grant - [https://www.gobusiness.gov.sg/energy-efficiency-grant/](https://www.gobusiness.gov.sg/energy-efficiency-grant/)
+
+##### Citation
+* Are you a sustainable company in the food industry looking to enhance your eco-friendly initiatives and meet the sustainability goals set by the Singapore government with the Energy Efficient Grant (EEG) introduced in September 2022? [1]
+* Imagine upgrading to energy-efficient equipment such as LED lighting, air-conditioning, cooking hobs, and refrigerators to reduce energy consumption, lower operating costs, and contribute towards achieving sustainability goals. [1]
+* To be eligible for the EEG, your business must be registered and operating in Singapore in the Food Service, Food Manufacturing, or Retail sectors, with a minimum of 30% local shareholding. [1]
+* Don't miss this opportunity to address your sustainability challenges and make significant strides towards a greener future for Singapore by applying for the EEG to enhance your sustainability practices. [1]`);
           setTimeout(async () => {
-            setVideoSource("./Singlife SFF Demo Full.mp4");
+            setVideoSource(
+              "https://res.cloudinary.com/dhm7d2jq6/video/upload/v1712460160/final/final_2024-04-07_11-10-39_b9421083-09cd-4610-82fc-28282c2fe088.mp4"
+            );
             setLoading(false);
           }, 1000 * 7);
         }, 1000);
         return "response";
-      } else if (name == "Hong Yu") {
-        setTimeout(async () => {
-          await formatSources([
-            {
-              url: "https://singlife.com/content/dam/public/sg/documents/lifestyle-insurance/singlife-travel-insurance/corporate-travel-brochure.pdf",
-              title: "corporate-travel-brochure",
-            },
-            {
-              url: "https://singlife.com/content/dam/public/sg/documents/lifestyle-insurance/singlife-travel-insurance/policy-documents/travel-summary-of-cover-aug2022.pdf",
-              title: "travel-summary-of-cover-aug2022",
-            },
-            {
-              url: "https://singlife.com/content/dam/public/sg/documents/lifestyle-insurance/singlife-travel-insurance/policy-documents/travel-summary-of-cover.pdf",
-              title: "travel-summary-of-cover",
-            },
-          ]);
-          setTimeout(async () => {
-            setVideoSource(
-              "https://singen.blob.core.windows.net/final/final_2023-11-16_08-19-11_faa5844d-c3e0-45d9-889f-08e8605b18a2.mp4"
-            );
-            setLoading(false);
-          }, 1000 * 4);
-        }, 1000);
-        return "response";
       }
+      // } else if (name == "Hong Yu") {
+      //   setTimeout(async () => {
+      //     await formatSources([
+      //       {
+      //         url: "https://singlife.com/content/dam/public/sg/documents/lifestyle-insurance/singlife-travel-insurance/corporate-travel-brochure.pdf",
+      //         title: "corporate-travel-brochure",
+      //       },
+      //       {
+      //         url: "https://singlife.com/content/dam/public/sg/documents/lifestyle-insurance/singlife-travel-insurance/policy-documents/travel-summary-of-cover-aug2022.pdf",
+      //         title: "travel-summary-of-cover-aug2022",
+      //       },
+      //       {
+      //         url: "https://singlife.com/content/dam/public/sg/documents/lifestyle-insurance/singlife-travel-insurance/policy-documents/travel-summary-of-cover.pdf",
+      //         title: "travel-summary-of-cover",
+      //       },
+      //     ]);
+      //     setTimeout(async () => {
+      //       setVideoSource(
+      //         "https://singen.blob.core.windows.net/final/final_2023-11-16_08-19-11_faa5844d-c3e0-45d9-889f-08e8605b18a2.mp4"
+      //       );
+      //       setLoading(false);
+      //     }, 1000 * 4);
+      //   }, 1000);
+      //   return "response";
+      // }
       let response = await axios.post(
         `${import.meta.env.VITE_BACKEND_FASTAPI}/generateScript`,
         {
@@ -240,21 +241,7 @@ const Prompt = () => {
       );
 
       console.log(response);
-      await formatSources([
-        {
-          url: "https://singlife.com/content/dam/public/sg/documents/life/life-and-health-savings-retirement-forms/for-new-business-and-underwriting-forms-and-questionnaires/Q21_Adviser_Financial_Questionnaire_for_Business_Cover.pdf",
-          title: "Q21_Adviser_Financial_Questionnaire_for_Business_Cover",
-        },
-        {
-          url: "https://singlife.com/content/dam/public/sg/documents/life/life-and-health-savings-retirement-forms/for-new-business-and-underwriting-forms-and-questionnaires/Q38_Occupational_Supplementary_Questionnaire.pdf",
-          title: "Q38_Occupational_Supplementary_Questionnaire",
-        },
-        {
-          url: "https://singlife.com/content/dam/public/sg/documents/life/life-and-health-savings-retirement-forms/for-new-business-and-underwriting-forms-and-questionnaires/Q18_Self-Employed_Supplementary_Questionnaire.pdf",
-          title: "Q18_Self-Employed_Supplementary_Questionnaire",
-        },
-      ]);
-      // await formatSources(response.data.sources);
+      await formatSources(response.data.sources);
       await generateVideo(response.data.list_of_scenes);
       setLoading(false);
       return response;

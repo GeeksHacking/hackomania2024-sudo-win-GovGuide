@@ -5,3 +5,11 @@
 p {
   margin: 0 !important;
 }
+
+#markdownContainer ol {
+  list-style: decimal !important;
+}
+
+#markdownContainer ul {
+  list-style: disc !important;
+}
