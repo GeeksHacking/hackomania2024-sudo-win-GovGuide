@@ -119,7 +119,9 @@ def upload():
 @app.post("/generateScript")
 async def generateScript(UserData: UserData):
     script_gen = ScriptGenerator()
-    script_json = script_gen(UserData)
+    script_json, sources = script_gen(UserData)
+    
+    script_json['sources'] = sources
 
     return script_json
 

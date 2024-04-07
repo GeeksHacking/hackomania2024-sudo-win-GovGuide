@@ -73,3 +73,8 @@ This is the script: \"\"\"{script}\"\"\"
 
 Parse the script to follow the JSON format above, as well as ensure visual generic image scenes such as "family trip skiing", NO ACRYONYMS KEEP IT SIMPLE. Remember to follow the script WORD FOR WORD. Scenes should be generic and only 3 words. Populate the list of scenes. Keep to ONE SENTENCE PER SCENE.
 """
+
+GET_RESOURCES = """You will be given information about business, a list of explanations of why schemes are relevant to a business, a script that, and a list of URLs corresponding to the schemes in the list of explanations
+
+WIP
+"""
