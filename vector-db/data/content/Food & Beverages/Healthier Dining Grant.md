@@ -5,7 +5,7 @@ The HDG is a co-funding scheme offered by HPB to support our HDP Partners in the
 HDP Partners are eligible for the Healthier Dining Grant (HDG). You can apply for the grant at any time during your period of participation as a HDP Partner, subject to the eligibility criteria below.
 
 The following types of F&B establishments with the number of outlets are eligible to apply for the HDG.
-≥ 3 outlets1 operating in the following types of F&B establishments:
+More than or equal to 3 outlets operating in the following types of F&B establishments:
 
     Restaurants
     Quick Service Restaurant/Fast Food
@@ -15,12 +15,12 @@ The following types of F&B establishments with the number of outlets are eligibl
     Bakeries
     Dessert Stores
 
-≥ 3 outlets1 operating in the following types of F&B establishments who have not used HPB’s complimentary nutrition analysis support:
+More than or equal to 3 outlets1 operating in the following types of F&B establishments who have not used HPB’s complimentary nutrition analysis support:
 
     Food Courts
     Institutional Caterers
 
-≥ 1 outlet operating in the following types of F&B establishments:
+More than or equal to 1 outlet operating in the following types of F&B establishments:
 
     Event Caterers
     F&B Companies Operating Solely on Digital Platform(s)
