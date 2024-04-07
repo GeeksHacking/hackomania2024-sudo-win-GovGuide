@@ -356,7 +356,7 @@ const Prompt = () => {
         </div>
 
         {textContent && (
-          <CardFooter className="p-6 w-screen">
+          <CardFooter className="p-4 w-screen">
             <div className="flex items-start w-full flex-col">
               <div className="w-full aspect-video">
                 <video

@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 
 final_*.mp4
+temp*.mp4

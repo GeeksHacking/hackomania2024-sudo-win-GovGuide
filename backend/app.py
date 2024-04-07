@@ -315,7 +315,7 @@ async def fakeVideo():
     ]
     videoList = []
     for idx, video in enumerate(videoArr):
-        tempFile = "./temp.mp4"
+        tempFile = f"./temp_{idx}.mp4"
         with open(tempFile, 'wb') as f:
             videoResponse = requests.get(video)
             f.write(videoResponse.content)
@@ -422,7 +422,7 @@ async def stitchVideos(MovieBody: MovieBody):
         if idx < max_idx:
             continue
 
-        tempFile = "./temp.mp4"
+        tempFile = f"./temp_{idx}.mp4"
         with open(tempFile, 'wb') as f:
             videoResponse = requests.get(video)
             f.write(videoResponse.content)
@@ -435,7 +435,7 @@ async def stitchVideos(MovieBody: MovieBody):
             right_idx += 1
 
         duration = subs[int(idx)][0][1] - subs[int(idx)][0][0]
-        tempVideo = editor.VideoFileClip(tempFile)
+        tempVideo = editor.VideoFileClip(video)
         tempVideo = tempVideo.loop(duration=total_duration)
         tempVideo = tempVideo.set_fps(30)
         tempVideo = tempVideo.fl_image(lambda pic: resizer(pic.astype('uint8'), (1920, 1080)))
