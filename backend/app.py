@@ -13,6 +13,7 @@ import asyncio
 from uuid import uuid4
 
 import os
+
 os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"
 
 # Cloudinary
@@ -25,6 +26,7 @@ from elevenlabs.client import ElevenLabs
 
 # FastAPI
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 # Whisper
 import whisper_timestamped as whisper
@@ -48,6 +50,21 @@ config = cloudinary.config(
     api_key=os.getenv("CLOUDINARY_API_KEY"),
     api_secret=os.getenv("CLOUDINARY_API_SECRET"),
     secure=True,
+)
+
+# CORS
+origins = [
+    "http://gov-guide.vercel.app",
+    "https://gov-guide.vercel.app",
+    "http://localhost",
+    "http://localhost:5173",
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # HUGGINGFACE
@@ -98,12 +115,14 @@ def upload():
     )
     return {"image": srcURL}
 
+
 @app.post("/generateScript")
 async def generateScript(UserData: UserData):
     script_gen = ScriptGenerator()
     script_json = script_gen(UserData)
 
     return script_json
+
 
 class VoiceBody(BaseModel):
     subtitles: List[str]
@@ -234,7 +253,7 @@ def split_text(text: str):
     return '\n'.join(lines)
 
 
-def annotate(clip, txt: str, txt_color="white", fontsize=75, font="Arial-Bold", blur=False, start = 0, duration = None):
+def annotate(clip, txt: str, txt_color="white", fontsize=75, font="Arial-Bold", blur=False, start=0, duration=None):
     txt = split_text(txt)
     txtclip = editor.TextClip(txt, fontsize=fontsize, font=font, color=txt_color)
     txtclip = txtclip.set_pos(("center", clip.h - txtclip.h - 150))
@@ -285,6 +304,7 @@ def resizer(pic, newsize):
     # arr.reshape(newshape)
     return np.array(resized_pil)
 
+
 @app.post("/fakeVideo")
 async def fakeVideo():
     videoArr = [
@@ -293,8 +313,8 @@ async def fakeVideo():
     ]
     videoList = []
     for idx, video in enumerate(videoArr):
-        tempFile = "temp.mp4"
-        with open(tempFile,'wb') as f:
+        tempFile = "./temp.mp4"
+        with open(tempFile, 'wb') as f:
             videoResponse = requests.get(video)
             f.write(videoResponse.content)
             f.close()
@@ -315,6 +335,7 @@ async def fakeVideo():
     src_url = uploadFile(data, blob_name, folder='final', file_type="video")
     return {"final": src_url}
 
+
 def cut_sentences(movie_body: MovieBody):
     print("Before:", movie_body)
     new_subtitles = []
@@ -326,7 +347,7 @@ def cut_sentences(movie_body: MovieBody):
         for i, word in enumerate(sub_split):
             cur_len += len(word)
             if (i == len(sub_split) - 1) or (i < len(sub_split) - 1 and cur_len + len(sub_split[i + 1]) > 70):
-                new_subtitles.append(' '.join(sub_split[prev_i:i + 1]))
+                new_subtitles.append(' '.join(sub_split[prev_i : i + 1]))
                 new_videos.append(vid)
                 prev_i = i + 1
                 cur_len = 0
@@ -335,6 +356,7 @@ def cut_sentences(movie_body: MovieBody):
     movie_body.subtitles = new_subtitles
 
     return movie_body
+
 
 @app.post("/stitchVideos")
 async def stitchVideos(MovieBody: MovieBody):
@@ -377,7 +399,7 @@ async def stitchVideos(MovieBody: MovieBody):
                 break
             data_point = min_window[left_pad + i]
             dur += data_point[0] / data_point[1]
-        
+
         left_pad += alpha_len
 
         if len(subs) > 0:
@@ -398,11 +420,11 @@ async def stitchVideos(MovieBody: MovieBody):
         if idx < max_idx:
             continue
 
-        # tempFile = "temp.mp4"
-        # with open(tempFile, 'wb') as f:
-        #     videoResponse = requests.get(video)
-        #     f.write(videoResponse.content)
-        #     f.close()
+        tempFile = "./temp.mp4"
+        with open(tempFile, 'wb') as f:
+            videoResponse = requests.get(video)
+            f.write(videoResponse.content)
+            f.close()
 
         right_idx = idx
         total_duration = 0
@@ -411,7 +433,7 @@ async def stitchVideos(MovieBody: MovieBody):
             right_idx += 1
 
         duration = subs[int(idx)][0][1] - subs[int(idx)][0][0]
-        tempVideo = editor.VideoFileClip(video)
+        tempVideo = editor.VideoFileClip(tempFile)
         tempVideo = tempVideo.loop(duration=total_duration)
         tempVideo = tempVideo.set_fps(30)
         tempVideo = tempVideo.fl_image(lambda pic: resizer(pic.astype('uint8'), (1920, 1080)))
@@ -421,13 +443,19 @@ async def stitchVideos(MovieBody: MovieBody):
         while (right_idx < len(new_video)) and (new_video[right_idx] == new_video[idx]):
             print("start", subs[int(right_idx)][0][0])
             print("sub:", subs[int(right_idx)][1])
-            tempVideo = annotate(tempVideo, subs[right_idx][1], blur=True, start = total_duration, duration = subs[right_idx][0][1].total_seconds())
+            tempVideo = annotate(
+                tempVideo,
+                subs[right_idx][1],
+                blur=True,
+                start=total_duration,
+                duration=subs[right_idx][0][1].total_seconds(),
+            )
             print("end", subs[int(right_idx)][0][1])
             total_duration += subs[right_idx][0][1].total_seconds()
             right_idx += 1
 
         max_idx = max(max_idx, right_idx)
-        # os.remove(tempFile)
+        os.remove(tempFile)
         videoList.append(tempVideo)
 
     print("Processing Audio & Music")
@@ -439,7 +467,9 @@ async def stitchVideos(MovieBody: MovieBody):
 
     current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     blob_name = f"final_{current_time}_{generate_uuid()}.mp4"
-    final_clip.write_videofile(blob_name, fps=30, codec="libx264", audio_codec="aac", temp_audiofile="temp-audio.m4a", remove_temp = True)
+    final_clip.write_videofile(
+        blob_name, fps=30, codec="libx264", audio_codec="aac", temp_audiofile="temp-audio.m4a", remove_temp=True
+    )
     with open(blob_name, 'rb') as f:
         data = f.read()
         f.close()

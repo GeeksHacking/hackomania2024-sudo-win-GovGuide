@@ -136,7 +136,6 @@ const Prompt = () => {
       console.log({
         audio: data[1]["audio"],
         srt_file: data[1]["srt_file"],
-        music: "",
         video: data[2]["video"],
         subtitles: subtitles,
       });
@@ -225,13 +224,13 @@ const Prompt = () => {
         return "response";
       }
       let response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_FASTAPI}/query`,
+        `${import.meta.env.VITE_BACKEND_FASTAPI}/generateScript`,
         {
           name,
           industry,
-          needs,
+          need: needs,
           nature,
-          concerns,
+          concern: concerns,
         },
         {
           headers: {
@@ -241,8 +240,22 @@ const Prompt = () => {
       );
 
       console.log(response);
-      await formatSources(response.data.sources);
-      await generateVideo(response.data.video_script.list_of_scenes);
+      await formatSources([
+        {
+          url: "https://singlife.com/content/dam/public/sg/documents/life/life-and-health-savings-retirement-forms/for-new-business-and-underwriting-forms-and-questionnaires/Q21_Adviser_Financial_Questionnaire_for_Business_Cover.pdf",
+          title: "Q21_Adviser_Financial_Questionnaire_for_Business_Cover",
+        },
+        {
+          url: "https://singlife.com/content/dam/public/sg/documents/life/life-and-health-savings-retirement-forms/for-new-business-and-underwriting-forms-and-questionnaires/Q38_Occupational_Supplementary_Questionnaire.pdf",
+          title: "Q38_Occupational_Supplementary_Questionnaire",
+        },
+        {
+          url: "https://singlife.com/content/dam/public/sg/documents/life/life-and-health-savings-retirement-forms/for-new-business-and-underwriting-forms-and-questionnaires/Q18_Self-Employed_Supplementary_Questionnaire.pdf",
+          title: "Q18_Self-Employed_Supplementary_Questionnaire",
+        },
+      ]);
+      // await formatSources(response.data.sources);
+      await generateVideo(response.data.list_of_scenes);
       setLoading(false);
       return response;
     } catch (error) {
