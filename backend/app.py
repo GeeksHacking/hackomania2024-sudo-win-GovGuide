@@ -14,7 +14,7 @@ from uuid import uuid4
 
 import os
 
-os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"
+# os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"
 
 # Cloudinary
 import cloudinary
