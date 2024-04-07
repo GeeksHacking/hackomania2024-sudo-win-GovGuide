@@ -156,7 +156,7 @@ class ScriptGenerator:
 				doc_names.append(chunk.properties["title"])
 
 		documents = self.__get_whole_document(doc_names)
-		documents = [(doc.properties["content"], doc.properties["source"]) for doc in documents]
+		documents = [(doc.properties["content"], doc.properties["title"], doc.properties["source"]) for doc in documents]
 
 		return documents
 
@@ -171,12 +171,14 @@ class ScriptGenerator:
 		print("explain:", out)
 		return out
 
-	def get_sources(self, user_data: UserData, script: str, explanations: List[str], urls: List[str]) -> str:
-		 = self.chat4.invoke(
+	def get_sources(self, user_data: UserData, script: str, explanations: List[str], titles: List[str], urls: List[str]) -> str:
+		title_urls = list(zip(titles, urls))
+
+		sources = self.chat4.invoke(
 			[
 				HumanMessage(
 					content=GET_RESOURCES.format(
-						info=user_data, explanations=explanations, script = script, urls = urls
+						info=user_data, explanations=explanations, script = script, title_urls = title_urls
 					)
 				)
 			]
@@ -186,13 +188,11 @@ class ScriptGenerator:
 
 	def __call__(self, user_data) -> str:
 		relevant_tuples: List[List[str, str]] = self.get_relevant_docs(user_data)
-		relevant_docs = [doc for doc, url in relevant_tuples]
-		relevant_title = [doc for doc, url in relevant_tuples]
-		relevant_urls = [url for doc, url in relevant_tuples]
+		relevant_docs, relevant_titles, relevant_urls = zip(*relevant_tuples)
 
 		script, explanations = self.generate_script(user_data, relevant_docs)
 		script: str = self.enhance_script(user_data, script, explanations)
-		sources: str = self.get_sources(user_data, script, explanations, relevant_urls)
+		sources: str = self.get_sources(user_data, script, explanations, relevant_titles, relevant_urls)
 
 		script: str = self.format_script(script)
 

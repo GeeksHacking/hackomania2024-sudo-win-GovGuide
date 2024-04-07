@@ -79,12 +79,23 @@ GET_RESOURCES = """You will be given information about business, a list of expla
 Information about business: {info}
 Explanations of scheme and business: {explanations}
 Script: {script}
-List of URLs according to the schemes in explanations: {URLs}
+List of Title-URL pairs according to the schemes in explanations: {title_urls}
 
-Firstly, list 
-Follow this format:
+Your goal is to provide relevant citations/sources for the script.
+Firstly, list any relevant Title-URL pairs. Then, summarize the script into bullet points and cite/associate each point with the sources using square bracket.
+Here is the format you should follow:
 ```
+### Sources
+1. <relevant title> - <relevant url>
+2. <relevant title 2> - <relevant url 2>
+...
+
+### Citation
+- <summarized bullet point from script> [1][2]
+- <summarized bullet point from script> [1]
 ```
 
-Output markdown directly:
+Note how the citation refers to the number of the sources and cites it accurately. Only cite if it is relevant.
+
+Output the formatted markdown directly:
 """
