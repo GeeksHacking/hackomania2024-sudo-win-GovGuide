@@ -59,4 +59,4 @@ Building Plan and Universal Design Department
 Building and Construction Authority
 52 Jurong Gateway Road
 #10-01
-Singapore 608550
+ Singapore 608550
