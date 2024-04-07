@@ -15,7 +15,7 @@ More than or equal to 3 outlets operating in the following types of F&B establis
     Bakeries
     Dessert Stores
 
-More than or equal to 3 outlets1 operating in the following types of F&B establishments who have not used HPB’s complimentary nutrition analysis support:
+More than or equal to 3 outlets operating in the following types of F&B establishments who have not used HPB’s complimentary nutrition analysis support:
 
     Food Courts
     Institutional Caterers
