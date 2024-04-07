@@ -9,13 +9,13 @@ More than or equal to 3 outlets operating in the following types of F&B establis
 
     Restaurants
     Quick Service Restaurant/Fast Food
-    Cafés (Food Partners and/or Beverage Partners)
+    Cafs (Food Partners and/or Beverage Partners)
     Kiosks (Food Partners and/or Beverage Partners)
     Brand Chains (effective from 1 April 2023)
     Bakeries
     Dessert Stores
 
-More than or equal to 3 outlets operating in the following types of F&B establishments who have not used HPB’s complimentary nutrition analysis support:
+More than or equal to 3 outlets operating in the following types of F&B establishments who have not used HPBs complimentary nutrition analysis support:
 
     Food Courts
     Institutional Caterers
@@ -54,7 +54,7 @@ Implementation
 Applications for the Healthier Dining Grant (HDG) can be made at any time during the period of participation as a HDP Partner. Just send your completed application form together with the complete set of supporting documents to HPB at HPB_Healthy_Eating@hpb.gov.sg. 
 
 ## Benefits
-Under the HDG, HPB will reimburse the marketing and publicity costs incurred by the HDP Partner in relation to the production of approved in-store marketing materials or amends to your website or app, aimed at promoting healthier dishes endorsed by HPB under the HDP, referred to as “Qualifying Costs”.
+Under the HDG, HPB will reimburse the marketing and publicity costs incurred by the HDP Partner in relation to the production of approved in-store marketing materials or amends to your website or app, aimed at promoting healthier dishes endorsed by HPB under the HDP, referred to as Qualifying Costs.
 
 Under this co-funding grant scheme, after HPB has verified that the Qualifying Costs quotes are at competitive rates, HPB will reimburse you up to 80% of the Qualifying Costs actually incurred, up to the approved grant amount. The remaining 20% will be borne by you, the HDP Partner.
 
