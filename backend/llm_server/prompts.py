@@ -85,17 +85,17 @@ Your goal is to provide relevant citations/sources for the script.
 Firstly, list any relevant Title-URL pairs. Then, summarize the script into bullet points and cite/associate each point with the sources using square bracket.
 Here is the format you should follow:
 ```
-### Sources
-1. <relevant title> - <relevant url>
-2. <relevant title 2> - <relevant url 2>
+##### Sources
+1. <relevant title> - [<relevant url>](<relevant url>)
+2. <relevant title 2> - [<relevant url 2>](<relevant url 2>)
 ...
 
-### Citation
-- <summarized bullet point from script> [1][2]
-- <summarized bullet point from script> [1]
+##### Citation
+* <summarized bullet point from script> [1][2]
+* <summarized bullet point from script> [1]
 ```
 
-Note how the citation refers to the number of the sources and cites it accurately. Only cite if it is relevant.
+Remember to put the sources as a numbered list. Note how the citation refers to the number of the sources and cites it accurately. Only cite if it is relevant. Pay attention to how the URLs are clickable links as well.
 
 Output the formatted markdown directly:
 """
