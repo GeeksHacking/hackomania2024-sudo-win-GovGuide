@@ -156,7 +156,7 @@ class ScriptGenerator:
 				doc_names.append(chunk.properties["title"])
 
 		documents = self.__get_whole_document(doc_names)
-		documents = [doc.properties["content"] for doc in documents]
+		documents = [(doc.properties["content"], doc.properties["source"]) for doc in documents]
 
 		return documents
 
